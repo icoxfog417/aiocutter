@@ -8,6 +8,8 @@
 *.pydevproject
 *.kpf
 venv
+/dist/
+MANIFEST
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 

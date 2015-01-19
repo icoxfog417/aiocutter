@@ -3,12 +3,16 @@ from distutils.core import setup
 setup(
     name='aiocutter',
     packages=['aiocutter'],
-    version='0.1.0',
+    install_requires=[
+        'aiohttp',
+        'beautifulsoup4'
+    ],
+    version='0.0.1',
     description='scraping tool for asyncio',
     author='icoxfog417',
     author_email='icoxfog417@yahoo.co.jp',
     url='https://github.com/icoxfog417/aiocutter',
-    download_url='',
+    download_url='https://github.com/icoxfog417/aiocutter/tarball/master',
     keywords=['asyncio', 'scraping'],
-    license='',
+    classifiers=[],
 )
