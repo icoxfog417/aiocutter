@@ -8,6 +8,8 @@ aiocutter is scraping tool for [asyncio](https://docs.python.org/3/library/async
 ## Usage
 
 ```
+from aiocutter import aiocutter
+
 url = "https://github.com/python/pythondotorg/issues"
 cutter = aiocutter.AioCutter()
 result = cutter.run(url, GithubIssue)

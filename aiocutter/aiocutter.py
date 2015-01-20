@@ -10,22 +10,25 @@ from .logger import create_logger
 class AioCutter():
 
     def __init__(self,
-                 data_folder="./data",
                  name=__name__,
                  parallel=5,
                  proxy=None,
                  proxy_auth=None,
                  is_write_file=True,
+                 data_folder="",
                  dump_size=100,
                  log_level=logging.WARNING,
                  handler=logging.StreamHandler(sys.stderr)):
 
-        self.data_folder = data_folder
-        self._name = name
+        self.name = name
         self._semaphore = asyncio.Semaphore(parallel)
         self._connector = None
-        self._logger = create_logger(self._name, log_level, handler)
+        self._logger = create_logger(self.name, log_level, handler)
         self.is_write_file = is_write_file
+        self.data_folder = data_folder
+        if self.is_write_file and not self.data_folder:
+            self.data_folder = os.path.join(os.path.dirname(sys.argv[0]), "./data")
+        
         self.dump_size = dump_size
 
         if proxy:
@@ -36,7 +39,7 @@ class AioCutter():
                 self._connector = aiohttp.ProxyConnector(proxy=env_proxy)
 
     def run(self, url, scrap_class):
-        if not os.path.exists(self.data_folder):
+        if self.is_write_file and not os.path.exists(self.data_folder):
             raise Exception("Data folder {0} is not exist.".format(self.data_folder))
 
         loop = asyncio.get_event_loop()
@@ -61,7 +64,7 @@ class AioCutter():
                 try:
                     html = yield from self.fetch(next_url)
                 except Exception as ex:
-                    self._logger.exception("Exception has occurred when fetching the url.", ex)
+                    self._logger.exception("Exception has occurred when fetching the url.")
                     next_url = ""  # exit loop
                     continue
 
@@ -78,7 +81,7 @@ class AioCutter():
                                 rel = t.result()
                                 ins.relates[rel[0]] = rel[1]
                             except Exception as ex:
-                                self._logger.exception("Exception has occurred when extracting relation.", ex)
+                                self._logger.exception("Exception has occurred when extracting relation.")
 
                     instances.append(ins)
 
@@ -114,8 +117,9 @@ class AioCutter():
         if from_index > 0:
             write_type = "ab"
 
-        with open(f_result) as targetfile:
-            lines = sum(1 for line in targetfile)
+        if os.path.isfile(f_result):
+            with open(f_result) as targetfile:
+                lines = sum(1 for line in targetfile)
 
         with open(f_result, write_type) as outfile:
             self._logger.debug("Write {0} from {1} to {2}.".format(name, lines, len(result[from_index:]) - 1))

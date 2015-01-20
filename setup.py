@@ -7,7 +7,7 @@ setup(
         'aiohttp',
         'beautifulsoup4'
     ],
-    version='0.0.2',
+    version='0.0.3',
     description='scraping tool for asyncio',
     author='icoxfog417',
     author_email='icoxfog417@yahoo.co.jp',

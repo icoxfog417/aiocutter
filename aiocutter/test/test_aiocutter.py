@@ -9,7 +9,7 @@ class TestAioCutter(unittest.TestCase):
 
     def test_single_scrap(self):
         url = "http://www.bbc.com/news/science_and_environment/"
-        cutter = aiocutter.AioCutter()
+        cutter = aiocutter.AioCutter(data_folder="./data")
         BBCTopNews.Relations.clear()
         result = cutter.run(url, BBCTopNews)
 
@@ -23,7 +23,7 @@ class TestAioCutter(unittest.TestCase):
     def test_relation(self):
 
         url = "http://www.bbc.com/news/science_and_environment/"
-        cutter = aiocutter.AioCutter()
+        cutter = aiocutter.AioCutter(data_folder="./data")
         BBCTopNews.add_relation(BBCNews)
         result = cutter.run(url, BBCTopNews)
 
@@ -35,7 +35,7 @@ class TestAioCutter(unittest.TestCase):
     def test_paging(self):
 
         url = "https://github.com/python/pythondotorg/issues"
-        cutter = aiocutter.AioCutter(log_level=logging.DEBUG)
+        cutter = aiocutter.AioCutter(data_folder="./data", log_level=logging.DEBUG)
         result = cutter.run(url, GithubIssue)
 
         for r in result[:10]:
