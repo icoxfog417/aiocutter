@@ -62,9 +62,9 @@ class Scrap():
             return [""]
 
     @classmethod
-    def _get_element_text(cls, html):
+    def _get_body_text(cls, html):
         texts = list(filter(lambda e: isinstance(e, bs4.NavigableString), html.contents))
         if len(texts) > 0:
-            return cls._trim(texts[0])
+            return cls._trim("".join(texts))
         else:
             return ""

@@ -15,6 +15,7 @@ class AioCutter():
                  parallel=5,
                  proxy=None,
                  proxy_auth=None,
+                 is_write_file=True,
                  dump_size=100,
                  log_level=logging.WARNING,
                  handler=logging.StreamHandler(sys.stderr)):
@@ -24,6 +25,7 @@ class AioCutter():
         self._semaphore = asyncio.Semaphore(parallel)
         self._connector = None
         self._logger = create_logger(self._name, log_level, handler)
+        self.is_write_file = is_write_file
         self.dump_size = dump_size
 
         if proxy:
@@ -96,6 +98,9 @@ class AioCutter():
         return result
 
     def _write_file(self, result, from_index=0):
+        if not self.is_write_file:
+            return False
+
         if len(result) == 0:
             return False
 

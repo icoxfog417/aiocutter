@@ -24,9 +24,9 @@ class GithubIssue(Scrap):
 
     @classmethod
     def create(cls, url, html):
-        title = cls._get_element_text(html)
-        news = GithubIssue(title)
-        return news
+        title = cls._get_body_text(html)
+        issue = GithubIssue(title)
+        return issue
 
     def to_line(self):
         return "\t".join([self.title])

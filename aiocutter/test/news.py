@@ -33,8 +33,8 @@ class BBCTopNews(Scrap):
 
     @classmethod
     def create(cls, url, html):
-        title = cls._get_element_text(html.h2.a)
-        desc = cls._get_element_text(html.p)
+        title = cls._get_body_text(html.h2.a)
+        desc = cls._get_body_text(html.p)
 
         news = BBCTopNews(title, desc)
         return news
@@ -69,7 +69,7 @@ class BBCNews(Scrap):
 
         news_id = path_params[len(path_params) - 1]
         title = html.select(".story-header")[0].string
-        introduction = cls._get_element_text(html.select(".introduction")[0])
+        introduction = cls._get_body_text(html.select(".introduction")[0])
         paragraphs = list(map(lambda p: p.string, html.select(".cross-head")))
 
         news = BBCNews(news_id, title, introduction, paragraphs)
