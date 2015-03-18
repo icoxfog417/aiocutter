@@ -4,6 +4,7 @@ import asyncio
 import logging
 import aiohttp
 import bs4
+from urllib.parse import urlparse, unquote
 from .logger import create_logger
 
 
@@ -30,13 +31,7 @@ class AioCutter():
             self.data_folder = os.path.join(os.path.dirname(sys.argv[0]), "./data")
         
         self.dump_size = dump_size
-
-        if proxy:
-            self._connector = aiohttp.ProxyConnector(proxy=proxy, proxy_auth=proxy_auth)
-        else:
-            if "HTTP_PROXY" in os.environ:
-                env_proxy = os.environ["HTTP_PROXY"]
-                self._connector = aiohttp.ProxyConnector(proxy=env_proxy)
+        self.set_proxy(proxy, proxy_auth)
 
     def run(self, url, scrap_class):
         if self.is_write_file and not os.path.exists(self.data_folder):
@@ -45,6 +40,27 @@ class AioCutter():
         loop = asyncio.get_event_loop()
         result = loop.run_until_complete(self._scrape(url, scrap_class))
         return result
+
+    def set_proxy(self, proxy, proxy_auth):
+        _proxy = proxy
+        _proxy_auth = proxy_auth
+        if proxy is None:
+            proxy_env = "HTTP_PROXY"
+            if proxy_env in os.environ:
+                _proxy = os.environ[proxy_env]
+            elif proxy_env.lower() in os.environ:
+                _proxy = os.environ[proxy_env.lower()]
+
+        parsed = urlparse(_proxy)
+        proxy_url = "{0}://{1}:{2}".format(parsed.scheme if parsed.scheme else "http", parsed.hostname, parsed.port)
+
+        if _proxy_auth is None:
+            if parsed.username and parsed.password:
+                _proxy_auth = aiohttp.BasicAuth(unquote(parsed.username), unquote(parsed.password))
+            elif parsed.username:
+                _proxy_auth = aiohttp.BasicAuth(unquote(parsed.username))
+
+        self._connector = aiohttp.ProxyConnector(proxy=proxy_url, proxy_auth=_proxy_auth)
 
     @asyncio.coroutine
     def _scrape(self, url, scrap_class, root_chain=True):
